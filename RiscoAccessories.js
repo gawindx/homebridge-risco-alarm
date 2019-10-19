@@ -12,7 +12,7 @@ function RiscoCPPartitions(log, accConfig, homebridge) {
     this.RiscoSession = accConfig.RiscoSession;
     this.RiscoPartId = (function(){
         if (accConfig.accessorytype == 'system'){
-            return '';
+            return null;
         } else {
             return accConfig.config.id;
         }
@@ -22,7 +22,7 @@ function RiscoCPPartitions(log, accConfig, homebridge) {
     this.services = [];
     this.Service = homebridge.hap.Service;
     this.Characteristic = homebridge.hap.Characteristic;
-    
+
     this.infoService = new this.Service.AccessoryInformation();
     this.infoService
         .setCharacteristic(this.Characteristic.Manufacturer, "Daniel S")
@@ -115,7 +115,7 @@ RiscoCPPartitions.prototype = {
             var riscoArm;
             var cmd;
             var cmd_separator = (function(){
-                if (self.RiscoPartId == ''){
+                if (self.RiscoPartId == null){
                     return '';
                 }else{
                     return ':';
@@ -195,7 +195,7 @@ RiscoCPPartitions.prototype = {
             }
         } catch (err) {
             self.log.error(err);
-            self.securityService.setCharacteristic(self.Characteristic.SecuritySystemCurrentState, self.riscoCurrentState);            
+            self.securityService.setCharacteristic(self.Characteristic.SecuritySystemCurrentState, self.riscoCurrentState);
             callback(null, self.riscoCurrentState);
             return
         }
@@ -228,7 +228,7 @@ RiscoCPPartitions.prototype = {
                     Datas.push(self.RiscoSession.DiscoveredAccessories.partitions[Parts]);
                 }
             }
-            const PartStates = Datas.filter(parts => parts.id == self.RiscoPartId);
+            const PartStates = Datas.filter(parts => parts.id == (self.RiscoPartId | ''));
             if (PartStates.length != 0) {
                 self.riscoCurrentState = PartStatesRegistry[PartStates[0].actualState];
                 callback(null, self.riscoCurrentState);
